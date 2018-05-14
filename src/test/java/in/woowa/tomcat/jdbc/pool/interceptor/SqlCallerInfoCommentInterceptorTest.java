@@ -136,6 +136,6 @@ public class SqlCallerInfoCommentInterceptorTest {
         properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
-        assertThat(sqlCallerInfoCommentInterceptor.commentSql("SELECT 1 FROM DUAL")).isEqualTo("/* my_project 007 from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SELECT 1 FROM DUAL");
+        assertThat(sqlCallerInfoCommentInterceptor.commentSql("SELECT 1 FROM DUAL")).isEqualTo(" /* my_project 007 from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SELECT 1 FROM DUAL");
     }
 }

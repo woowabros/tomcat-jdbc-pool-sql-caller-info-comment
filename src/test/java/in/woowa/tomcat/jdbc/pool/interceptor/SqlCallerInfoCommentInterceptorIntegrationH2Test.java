@@ -14,9 +14,9 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SqlCallerInfoCommentInterceptorIntegrationTest {
+public class SqlCallerInfoCommentInterceptorIntegrationH2Test {
 
-    private Logger log = LoggerFactory.getLogger(SqlCallerInfoCommentInterceptorIntegrationTest.class);
+    private Logger log = LoggerFactory.getLogger(SqlCallerInfoCommentInterceptorIntegrationH2Test.class);
 
     private static DataSource dataSource;
 

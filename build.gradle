@@ -24,6 +24,7 @@ dependencies {
     testCompile("org.assertj:assertj-core:3.9.1")
 
     testCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.0.52'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 }
 
 targetCompatibility = javaVersion

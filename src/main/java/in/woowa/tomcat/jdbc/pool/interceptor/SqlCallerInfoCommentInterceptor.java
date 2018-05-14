@@ -106,6 +106,7 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
+        //  DO NOT Proxy
         return statement;
     }
 
@@ -115,7 +116,9 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
         if (compare(PREPARE_STATEMENT, methodName) || compare(PREPARE_CALL, methodName)) {
             changedArgs[0] = commentSql((String) args[0]);
+            log.debug("changed sql : {}", changedArgs[0]);
         }
+        log.debug("sql not changed.");
         return changedArgs;
     }
 
@@ -130,7 +133,7 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
      */
     protected String commentSql(String sql) {
         StringBuilder builder = new StringBuilder();
-        builder.append("/* ")
+        builder.append(" /* ")
             .append(projectName)
             .append(" from ")
             .append(LOCALHOST_IPADDRESSES)
