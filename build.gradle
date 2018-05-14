@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+ext {
+    javaVersion = '1.8'
+}
+
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.0'
+    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.0'
+
+
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.0.52'
+
+    testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
+    testCompile 'junit:junit:4.12'
+    testCompile("org.assertj:assertj-core:3.9.1")
+
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.0.52'
+}
+
+targetCompatibility = javaVersion
+sourceCompatibility = javaVersion
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
