@@ -98,11 +98,8 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
             return super.invoke(proxy, method, args);
         }
 
-        long start = System.currentTimeMillis();
         Object[] changedArgs = changeSql(method, args);
-        Object statement = super.invoke(proxy, method, changedArgs);
-        long delta = System.currentTimeMillis() - start;
-        return createStatement(proxy, method, changedArgs, statement, delta);
+        return super.invoke(proxy, method, changedArgs);
     }
 
     @Override

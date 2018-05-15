@@ -11,6 +11,10 @@ JDBC PreparedStatement SQL 요청을 가로채어, 맨 앞에 호출자 관련 �
 
 DB 관리자는 위 쿼리를 보고 호출자를 가늠할 수 있게 된다.
 
+## 요구사항
+* Java 8
+* Tomcat JDBC Connection Pool 8
+
 ## 설치
 [SqlCallerInfoCommentInterceptor](https://github.com/woowabros/tomcat-jdbc-pool-sql-caller-info-comment/blob/master/src/main/java/in/woowa/tomcat/jdbc/pool/interceptor/SqlCallerInfoCommentInterceptor.java) 소스를 복사하여
 자신의 프로젝트에 넣는다.
@@ -18,7 +22,7 @@ DB 관리자는 위 쿼리를 보고 호출자를 가늠할 수 있게 된다.
 혹은 gradle에서 의존성 지정
 
 ```
-compile 'in.woowa:tomcat-jdbc-pool-sql-caller-info-comment:0.2'
+compile 'in.woowa:tomcat-jdbc-pool-sql-caller-info-comment:0.3'
 ```
 
 ## 설정

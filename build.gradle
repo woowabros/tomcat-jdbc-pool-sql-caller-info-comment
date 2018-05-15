@@ -9,7 +9,7 @@ ext {
 }
 
 project.group = 'in.woowa'
-project.version = '0.2'
+project.version = '0.3'
 
 repositories {
     mavenCentral()

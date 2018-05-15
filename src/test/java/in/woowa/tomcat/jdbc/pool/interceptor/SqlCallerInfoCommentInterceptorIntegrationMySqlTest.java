@@ -37,7 +37,7 @@ public class SqlCallerInfoCommentInterceptorIntegrationMySqlTest {
     @Test
     public void preparedStatement() throws SQLException {
         try (Connection con = dataSource.getConnection()) {
-            try (PreparedStatement stmt = con.prepareStatement("/* 1base comment */ SELECT * FROM TESTUSER")) {
+            try (PreparedStatement stmt = con.prepareStatement("/* base comment */ SELECT * FROM TESTUSER")) {
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         int id = rs.getInt(1);
