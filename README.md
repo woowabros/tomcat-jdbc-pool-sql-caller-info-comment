@@ -15,8 +15,15 @@ DB 관리자는 위 쿼리를 보고 호출자를 가늠할 수 있게 된다.
 [SqlCallerInfoCommentInterceptor](https://github.com/woowabros/tomcat-jdbc-pool-sql-caller-info-comment/blob/master/src/main/java/in/woowa/tomcat/jdbc/pool/interceptor/SqlCallerInfoCommentInterceptor.java) 소스를 복사하여
 자신의 프로젝트에 넣는다.
 
+혹은 gradle에서 의존성 지정
+
+```
+compile 'in.woowa:tomcat-jdbc-pool-sql-caller-info-comment:0.2
+```
+
 ## 설정
 Tomcat JDBC Connection Pool 설정중에 `jdbcInterceptors` 프라퍼티를 다음과 같이 설정한다.
+
 
 ```java
 import org.apache.tomcat.jdbc.pool.DataSource;

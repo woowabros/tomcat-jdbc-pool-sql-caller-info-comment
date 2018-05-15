@@ -131,6 +131,9 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
     /**
      * 실질적인 주석 넣기를 수행한다.
+     *
+     * @param sql 원본 SQL
+     * @return 주석이 추가된 SQL
      */
     protected String commentSql(String sql) {
         StringBuilder builder = new StringBuilder();
