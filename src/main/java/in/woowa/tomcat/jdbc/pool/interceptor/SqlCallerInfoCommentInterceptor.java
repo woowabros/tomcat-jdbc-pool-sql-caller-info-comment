@@ -1,14 +1,10 @@
 package in.woowa.tomcat.jdbc.pool.interceptor;
 
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
-import org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -19,10 +15,17 @@ import java.util.regex.Pattern;
 /**
  * DB 쿼리 요청자에 관한 정보를 PreparedStatement SQL에 주석으로 남겨주는 Interceptor
  *
+ * <h3>SQL 에 남기는 주석 내용</h3>
  * <ul>
  * <li>호출자 IP</li>
  * <li>호출자 애플리케이션 이름 : projectName 키로 DataSource property 에 지정해준다. 숫자, 영문자, 밑줄, 공백만 허용된다.(SQL Injection 방어)</li>
  * </ul>
+ *
+ * <h3>설정</h3>
+ * <a href="https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html">tomcat jdbc connection pool</a>을 사용하여 SQL을 조작한다.
+ * <pre>dataSource.setJdbcInterceptors("in.woowa.tomcat.jdbc.pool.interceptor.SqlCallerInfoCommentInterceptor(projectName=[YourProjectName])");</pre>
+ *
+ * @see <a href="https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html">tomcat jdbc connection pool</a>
  */
 public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInterceptor {
 
@@ -51,8 +54,6 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
     /**
      * Initialize Local IP Addresses
-     *
-     * @return
      */
     private static String initializeLocalIpAddresses() {
         try {
