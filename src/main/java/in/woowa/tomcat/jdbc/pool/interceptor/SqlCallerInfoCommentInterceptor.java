@@ -42,6 +42,7 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
     public static final Pattern VALIDATION_PATTERN = Pattern.compile("[\\w ]+");
 
     public static final String LOCALHOST_IPADDRESSES;
+    public static final String UNKNOWN_LOCAL_IP = "unknown-local-ip";
 
     /**
      * PROJECT_NAME_PROPERTY 로 설정한 프로젝트명
@@ -75,7 +76,8 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
             return String.join(",", localIps);
         } catch (SocketException e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            log.error("Failed to initialize local IP addresses", e);
+            return UNKNOWN_LOCAL_IP;
         }
     }
 

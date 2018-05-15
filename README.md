@@ -22,7 +22,7 @@ DB 관리자는 위 쿼리를 보고 호출자를 가늠할 수 있게 된다.
 혹은 gradle에서 의존성 지정
 
 ```
-compile 'in.woowa:tomcat-jdbc-pool-sql-caller-info-comment:0.3'
+compile 'in.woowa:tomcat-jdbc-pool-sql-caller-info-comment:0.4'
 ```
 
 ## 설정
