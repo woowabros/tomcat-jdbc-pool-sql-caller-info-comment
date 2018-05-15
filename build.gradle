@@ -1,11 +1,15 @@
 plugins {
     id 'java'
 }
+apply plugin: 'maven'
 
 ext {
     javaVersion = '1.8'
+    slf4jVersion = '1.7.0'
 }
 
+project.group = 'in.woowa'
+project.version = '0.1'
 
 repositories {
     mavenCentral()
@@ -13,21 +17,37 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.0'
-    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.0'
 
-
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     compileOnly group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.0.52'
 
-    testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile 'junit:junit:4.12'
     testCompile("org.assertj:assertj-core:3.9.1")
 
     testCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.0.52'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.0'
+    testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
+    testCompile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    testCompile 'com.microsoft.sqlserver:mssql-jdbc:6.1.0.jre8'
+
+    testCompile "org.slf4j:jul-to-slf4j:${slf4jVersion}"
+    testCompile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    testCompile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+    testCompile "org.slf4j:jul-to-slf4j:${slf4jVersion}"
 }
 
 targetCompatibility = javaVersion
 sourceCompatibility = javaVersion
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'http://nexus.woowa.in/content/repositories/releases') {
+            }
+            snapshotRepository(url: 'http://nexus.woowa.in/content/repositories/snapshots') {
+            }
+        }
+    }
+}

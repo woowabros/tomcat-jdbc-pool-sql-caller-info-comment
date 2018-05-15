@@ -106,7 +106,7 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
-        //  DO NOT Proxy
+        //  TODO - proxy statement if you want manipulate Statement.executeXXX methods
         return statement;
     }
 
@@ -116,7 +116,7 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
         if (compare(PREPARE_STATEMENT, methodName) || compare(PREPARE_CALL, methodName)) {
             changedArgs[0] = commentSql((String) args[0]);
-            log.debug("changed sql : {}", changedArgs[0]);
+            log.debug("sql changed : {}", changedArgs[0]);
         }
         log.debug("sql not changed.");
         return changedArgs;
