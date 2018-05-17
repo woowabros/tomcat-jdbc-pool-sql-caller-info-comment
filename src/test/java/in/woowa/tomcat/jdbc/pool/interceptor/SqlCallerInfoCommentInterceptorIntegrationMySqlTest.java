@@ -27,7 +27,7 @@ public class SqlCallerInfoCommentInterceptorIntegrationMySqlTest {
 
     @BeforeClass
     public static void setUpClass() {
-        assumeFalse(System.getProperty("desiableIntegrationTest", "false").equals("true"));
+        assumeFalse(System.getProperty("disableIntegrationTest", "false").equals("true"));
 
         System.setProperty("org.slf4j.simplelogger.defaultlog", "debug");
 
