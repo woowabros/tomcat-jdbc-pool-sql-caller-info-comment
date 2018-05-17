@@ -110,13 +110,19 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
         return statement;
     }
 
-    private Object[] changeSql(Method method, Object[] args) {
+    protected Object[] changeSql(Method method, Object[] args) {
+        if (args == null) {
+            return null;
+        }
+
         final String methodName = method.getName();
         Object[] changedArgs = Arrays.copyOf(args, args.length);
 
         if (compare(PREPARE_STATEMENT, methodName) || compare(PREPARE_CALL, methodName)) {
             changedArgs[0] = commentSql((String) args[0]);
             log.debug("sql changed : {}", changedArgs[0]);
+        } else {
+            return args;
         }
         log.debug("sql not changed.");
         return changedArgs;

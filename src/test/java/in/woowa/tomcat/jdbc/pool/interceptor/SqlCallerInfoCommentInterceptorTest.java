@@ -4,6 +4,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,6 +130,39 @@ public class SqlCallerInfoCommentInterceptorTest {
 
         assertThat(sqlCallerInfoCommentInterceptor.getProjectName()).isEqualTo(projectName);
     }
+
+    @Test
+    public void changeSql_null_args() throws NoSuchMethodException {
+        assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("createStatement"), null)).isNull();
+    }
+
+
+    @Test
+    public void changeSql_just_createStatement() throws NoSuchMethodException {
+        Object[] args = {1, 2};
+        assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("createStatement", int.class, int.class), args)).isSameAs(args);
+    }
+
+    @Test
+    public void changeSql_prepareStatement_commentSql() throws NoSuchMethodException {
+        String projectName = "my_project";
+        properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
+        sqlCallerInfoCommentInterceptor.setProperties(properties);
+
+        assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("prepareStatement", String.class), new Object[]{"select 1"}))
+            .containsExactly(" /* my_project from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ select 1");
+    }
+
+    @Test
+    public void changeSql_prepareCall_commentSql() throws NoSuchMethodException {
+        String projectName = "my_project_sp";
+        properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
+        sqlCallerInfoCommentInterceptor.setProperties(properties);
+
+        assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("prepareCall", String.class), new Object[]{"SOME_SP"}))
+            .containsExactly(" /* my_project_sp from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SOME_SP");
+    }
+
 
     @Test
     public void commentSql() {

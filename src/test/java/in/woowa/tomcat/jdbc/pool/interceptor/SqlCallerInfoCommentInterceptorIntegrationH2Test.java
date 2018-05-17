@@ -7,10 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,6 +38,33 @@ public class SqlCallerInfoCommentInterceptorIntegrationH2Test {
                         String name = rs.getString(2);
 
                         log.debug("id : {} -> {}", id, name);
+
+                        assertThat(id).isEqualTo(7);
+                        assertThat(name).isEqualTo("Baemin");
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void getMetaData() throws SQLException {
+        try (Connection con = dataSource.getConnection()) {
+            DatabaseMetaData metaData = con.getMetaData();
+            assertThat(metaData.getDatabaseMajorVersion()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    public void createStatement() throws SQLException {
+        try (Connection con = dataSource.getConnection()) {
+            try (Statement stmt = con.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("/* just statement */ SELECT * FROM TESTUSER")) {
+                    while (rs.next()) {
+                        int id = rs.getInt(1);
+                        String name = rs.getString(2);
+
+                        log.debug("statement id : {} -> {}", id, name);
 
                         assertThat(id).isEqualTo(7);
                         assertThat(name).isEqualTo("Baemin");
