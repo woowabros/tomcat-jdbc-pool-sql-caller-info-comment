@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,7 +164,6 @@ public class SqlCallerInfoCommentInterceptorTest {
             .containsExactly(" /* my_project_sp from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SOME_SP");
     }
 
-
     @Test
     public void commentSql() {
         String projectName = "my_project 007";
@@ -172,4 +172,37 @@ public class SqlCallerInfoCommentInterceptorTest {
 
         assertThat(sqlCallerInfoCommentInterceptor.commentSql("SELECT 1 FROM DUAL")).isEqualTo(" /* my_project 007 from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SELECT 1 FROM DUAL");
     }
+
+    @Test
+    public void changeExecuteSql_null_args() throws NoSuchMethodException {
+        assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("executeQuery", String.class), null)).isNull();
+    }
+
+
+    @Test
+    public void changeExecuteSql_just_execute() throws NoSuchMethodException {
+        Object[] args = {"sql", 2};
+        assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("execute", String.class, int.class), args)).isSameAs(args);
+    }
+
+    @Test
+    public void changeExecuteSql_executeQuery_commentSql() throws NoSuchMethodException {
+        String projectName = "my_project";
+        properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
+        sqlCallerInfoCommentInterceptor.setProperties(properties);
+
+        assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("executeQuery", String.class), new Object[]{"select 1"}))
+            .containsExactly(" /* my_project from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ select 1");
+    }
+
+    @Test
+    public void changeExecuteSql_executeUpdate_commentSql() throws NoSuchMethodException {
+        String projectName = "my_project_sp";
+        properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
+        sqlCallerInfoCommentInterceptor.setProperties(properties);
+
+        assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("executeUpdate", String.class), new Object[]{"UPDATE ..."}))
+            .containsExactly(" /* my_project_sp from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ UPDATE ...");
+    }
+
 }

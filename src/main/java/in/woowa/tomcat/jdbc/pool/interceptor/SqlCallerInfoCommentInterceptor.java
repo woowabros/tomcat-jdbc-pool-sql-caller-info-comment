@@ -1,19 +1,22 @@
 package in.woowa.tomcat.jdbc.pool.interceptor;
 
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
+import org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * DB 쿼리 요청자에 관한 정보를 PreparedStatement SQL에 주석으로 남겨주는 Interceptor
+ * DB 쿼리 요청자에 관한 정보를 Statement SQL에 주석으로 삽입해 주는 Interceptor - DBA 등이 이 주석을 보고 호출한 프로젝트를 판별할 수 있게 해준다.
  *
  * <h3>SQL 에 남기는 주석 내용</h3>
  * <ul>
@@ -27,7 +30,7 @@ import java.util.regex.Pattern;
  *
  * @see <a href="https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html">tomcat jdbc connection pool</a>
  */
-public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInterceptor {
+public class SqlCallerInfoCommentInterceptor extends StatementDecoratorInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(SqlCallerInfoCommentInterceptor.class);
 
@@ -105,13 +108,30 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
     }
 
     @Override
-    public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
-        //  TODO - proxy statement if you want manipulate Statement.executeXXX methods
-        return statement;
+    protected Object createDecorator(Object proxy, Method method, Object[] args, Object statement, Constructor<?> constructor, String sql) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Object result = null;
+        SqlChangeStatementProxy<Statement> statementProxy =
+            new SqlChangeStatementProxy<>((Statement) statement, sql);
+        result = constructor.newInstance(new Object[]{statementProxy});
+        statementProxy.setActualProxy(result);
+        statementProxy.setConnection(proxy);
+        statementProxy.setConstructor(constructor);
+        return result;
     }
 
+    public boolean isExecuteUpdate(Method method) {
+        return isExecuteUpdate(method.getName());
+    }
+
+    private boolean isExecuteUpdate(String name) {
+        return EXECUTE_UPDATE.equals(name);
+    }
+
+    /** Connection.prepareStatement 를 위한 Sql 변경 */
     protected Object[] changeSql(Method method, Object[] args) {
         if (args == null) {
+            log.debug("sql not changed {}", method);
+
             return null;
         }
 
@@ -120,14 +140,31 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
 
         if (compare(PREPARE_STATEMENT, methodName) || compare(PREPARE_CALL, methodName)) {
             changedArgs[0] = commentSql((String) args[0]);
-            log.debug("sql changed : {}", changedArgs[0]);
+            log.debug("sql changed : {}, {}", method, changedArgs[0]);
         } else {
+            log.debug("sql not changed {}", method);
             return args;
         }
-        log.debug("sql not changed.");
         return changedArgs;
     }
 
+    /** Statement.executeQuery, executeUpdate 를 위한 Sql 변경 */
+    protected Object[] changeExecuteSql(Method method, Object[] args) {
+        if (args == null) {
+            log.debug("sql not changed {}", method);
+            return args;
+        }
+
+        if (!isExecuteQuery(method) && !isExecuteUpdate(method)) {
+            log.debug("sql not changed {}", method);
+            return args;
+        }
+
+        Object[] changedArgs = Arrays.copyOf(args, args.length);
+        changedArgs[0] = commentSql((String) args[0]);
+        log.debug("sql changed : {}, {}", method, changedArgs[0]);
+        return changedArgs;
+    }
 
     @Override
     public void closeInvoked() {
@@ -166,5 +203,19 @@ public class SqlCallerInfoCommentInterceptor extends AbstractCreateStatementInte
         if (!VALIDATION_PATTERN.matcher(projectName).matches()) {
             throw new IllegalArgumentException("projectName '" + projectName + "' contains illegal chars. projectName must contain only alpha numerics, spaces and underscores.");
         }
+    }
+
+    protected class SqlChangeStatementProxy<T extends java.sql.Statement> extends StatementProxy<T> {
+
+        public SqlChangeStatementProxy(T delegate, String sql) {
+            super(delegate, sql);
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Object[] changedArgs = changeExecuteSql(method, args);
+            return super.invoke(proxy, method, changedArgs);
+        }
+
     }
 }

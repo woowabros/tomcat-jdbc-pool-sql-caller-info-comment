@@ -68,8 +68,12 @@ public class SqlCallerInfoCommentInterceptorIntegrationH2Test {
 
                         assertThat(id).isEqualTo(7);
                         assertThat(name).isEqualTo("Baemin");
+
                     }
                 }
+
+                int updated = stmt.executeUpdate("UPDATE TESTUSER SET NAME='배민' WHERE id=7");
+                assertThat(updated).isEqualTo(1);
             }
         }
     }
