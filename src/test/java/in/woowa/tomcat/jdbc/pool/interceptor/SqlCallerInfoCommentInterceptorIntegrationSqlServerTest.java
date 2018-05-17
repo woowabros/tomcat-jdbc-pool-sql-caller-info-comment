@@ -16,7 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
+/**
+ * <code>-DdisableIntegrationTest=true</code> 이면 이 테스트를 실행하지 않는다.
+ */
 public class SqlCallerInfoCommentInterceptorIntegrationSqlServerTest {
 
     private Logger log = LoggerFactory.getLogger(SqlCallerInfoCommentInterceptorIntegrationSqlServerTest.class);
@@ -25,6 +29,8 @@ public class SqlCallerInfoCommentInterceptorIntegrationSqlServerTest {
 
     @BeforeClass
     public static void setUpClass() {
+        assumeFalse(System.getProperty("desiableIntegrationTest", "false").equals("true"));
+
         System.setProperty("org.slf4j.simplelogger.defaultlog", "debug");
         System.setProperty("org.slf4j.simplelogger.log.com.microsoft.sqlserver", "info");
         System.setProperty("org.slf4j.simplelogger.log.com.microsoft.sqlserver.jdbc.Connection", "debug");
@@ -65,6 +71,8 @@ public class SqlCallerInfoCommentInterceptorIntegrationSqlServerTest {
 
     @AfterClass
     public static void tearDownClass() {
-        dataSource.close();
+        if (dataSource != null) {
+            dataSource.close();
+        }
     }
 }

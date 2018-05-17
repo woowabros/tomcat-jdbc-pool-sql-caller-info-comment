@@ -38,5 +38,5 @@ dataSource.setJdbcInterceptors("in.woowa.tomcat.jdbc.pool.interceptor.SqlCallerI
 ```
 여기서 `wowahan`을 자신의 프로젝트 명으로 지정하면 된다.
 
-**영문 대소문자, 숫자, 밑줄(_)만 허용된다.**
+**영문 대소문자, 숫자, 밑줄(_), 공백만 허용된다.**
 

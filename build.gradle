@@ -1,7 +1,19 @@
+buildscript {
+    repositories {
+        maven { url "http://nexus.woowa.in/content/groups/public" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
+    }
+}
+
 plugins {
     id 'java'
 }
 apply plugin: 'maven'
+apply plugin: "org.sonarqube"
+apply plugin: 'jacoco'
 
 ext {
     javaVersion = '1.8'
@@ -66,4 +78,44 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+jacoco {
+    toolVersion = "0.8.0"
+}
+
+test {
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+        ignoreFailures = true
+    }
+    jacoco {
+        enabled = true
+        destinationFile = file("${buildDir}/jacoco/jacoco.exec")
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/reports/jacoco/html")
+    }
+    executionData = files("${buildDir}/jacoco/jacoco.exec")
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", project.hasProperty('sonarHostUrl') ? sonarHostUrl : "http://intra-sonarqube.woowa.in:8080" // -PsonarHostUrl="http://sonarqube.woowa.in:8080" for local PC
+        property "sonar.language", "java"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.exclusions", "**/*Test*.*"
+        property "sonar.test.inclusions", "**/*Test.groovy,**/*Test.java"
+        property "sonar.coverage.exclusions", "**/*Test*.*"
+        property "sonar.sources", "src/main/java"
+        property "sonar.junit.reportPaths", "${buildDir}/test-results"
+        property "sonar.jacoco.reportPaths", "${buildDir}/jacoco/jacoco.exec"
+    }
 }
