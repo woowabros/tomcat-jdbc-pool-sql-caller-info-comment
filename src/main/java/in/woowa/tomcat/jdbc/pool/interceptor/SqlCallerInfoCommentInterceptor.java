@@ -138,7 +138,8 @@ public class SqlCallerInfoCommentInterceptor extends StatementDecoratorIntercept
         final String methodName = method.getName();
         Object[] changedArgs = Arrays.copyOf(args, args.length);
 
-        if (compare(PREPARE_STATEMENT, methodName) || compare(PREPARE_CALL, methodName)) {
+        // PREPARE_CALL does not support comment prefix
+        if (compare(PREPARE_STATEMENT, methodName)) {
             changedArgs[0] = commentSql((String) args[0]);
             log.debug("sql changed : {}, {}", method, changedArgs[0]);
         } else {

@@ -154,14 +154,15 @@ public class SqlCallerInfoCommentInterceptorTest {
             .containsExactly(" /* my_project from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ select 1");
     }
 
+    /** prepareCall 은 DB에 따라 prefix된 주석을 허용하지 않고 있다. */
     @Test
-    public void changeSql_prepareCall_commentSql() throws NoSuchMethodException {
+    public void changeSql_prepareCall_must_not_commentSql() throws NoSuchMethodException {
         String projectName = "my_project_sp";
         properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
         assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("prepareCall", String.class), new Object[]{"SOME_SP"}))
-            .containsExactly(" /* my_project_sp from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SOME_SP");
+            .containsExactly("SOME_SP");
     }
 
     @Test
