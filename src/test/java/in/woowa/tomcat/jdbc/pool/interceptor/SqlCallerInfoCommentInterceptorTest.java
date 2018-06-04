@@ -24,11 +24,6 @@ public class SqlCallerInfoCommentInterceptorTest {
     }
 
     @Test
-    public void localhostIpaddresses() {
-        assertThat(SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES).isNotBlank();
-    }
-
-    @Test
     public void setProperty_projectName_null() {
         properties.clear();
         try {
@@ -151,7 +146,7 @@ public class SqlCallerInfoCommentInterceptorTest {
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
         assertThat(sqlCallerInfoCommentInterceptor.changeSql(Connection.class.getMethod("prepareStatement", String.class), new Object[]{"select 1"}))
-            .containsExactly(" /* my_project from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ select 1");
+            .containsExactly(" /* my_project */ select 1");
     }
 
     /** prepareCall 은 DB에 따라 prefix된 주석을 허용하지 않고 있다. */
@@ -171,7 +166,7 @@ public class SqlCallerInfoCommentInterceptorTest {
         properties.put(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, new PoolProperties.InterceptorProperty(SqlCallerInfoCommentInterceptor.PROJECT_NAME_KEY, projectName));
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
-        assertThat(sqlCallerInfoCommentInterceptor.commentSql("SELECT 1 FROM DUAL")).isEqualTo(" /* my_project 007 from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ SELECT 1 FROM DUAL");
+        assertThat(sqlCallerInfoCommentInterceptor.commentSql("SELECT 1 FROM DUAL")).isEqualTo(" /* my_project 007 */ SELECT 1 FROM DUAL");
     }
 
     @Test
@@ -193,7 +188,7 @@ public class SqlCallerInfoCommentInterceptorTest {
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
         assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("executeQuery", String.class), new Object[]{"select 1"}))
-            .containsExactly(" /* my_project from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ select 1");
+            .containsExactly(" /* my_project */ select 1");
     }
 
     @Test
@@ -203,7 +198,7 @@ public class SqlCallerInfoCommentInterceptorTest {
         sqlCallerInfoCommentInterceptor.setProperties(properties);
 
         assertThat(sqlCallerInfoCommentInterceptor.changeExecuteSql(Statement.class.getMethod("executeUpdate", String.class), new Object[]{"UPDATE ..."}))
-            .containsExactly(" /* my_project_sp from " + SqlCallerInfoCommentInterceptor.LOCALHOST_IPADDRESSES + " */ UPDATE ...");
+            .containsExactly(" /* my_project_sp */ UPDATE ...");
     }
 
 }

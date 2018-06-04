@@ -8,11 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -44,45 +42,10 @@ public class SqlCallerInfoCommentInterceptor extends StatementDecoratorIntercept
      */
     public static final Pattern VALIDATION_PATTERN = Pattern.compile("[\\w ]+");
 
-    public static final String LOCALHOST_IPADDRESSES;
-    public static final String UNKNOWN_LOCAL_IP = "unknown-local-ip";
-
     /**
      * PROJECT_NAME_PROPERTY 로 설정한 프로젝트명
      */
     private String projectName;
-
-    static {
-        LOCALHOST_IPADDRESSES = initializeLocalIpAddresses();
-    }
-
-    /**
-     * Initialize Local IP Addresses
-     */
-    private static String initializeLocalIpAddresses() {
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-
-            List<String> localIps = new ArrayList<>();
-
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress()) {
-                        localIps.add(inetAddress.getHostAddress());
-                    }
-                }
-            }
-
-            return String.join(",", localIps);
-        } catch (SocketException e) {
-            log.error("Failed to initialize local IP addresses", e);
-            return UNKNOWN_LOCAL_IP;
-        }
-    }
 
     public String getProjectName() {
         return projectName;
@@ -127,7 +90,9 @@ public class SqlCallerInfoCommentInterceptor extends StatementDecoratorIntercept
         return EXECUTE_UPDATE.equals(name);
     }
 
-    /** Connection.prepareStatement 를 위한 Sql 변경 */
+    /**
+     * Connection.prepareStatement 를 위한 Sql 변경
+     */
     protected Object[] changeSql(Method method, Object[] args) {
         if (args == null) {
             log.debug("sql not changed {}", method);
@@ -149,7 +114,9 @@ public class SqlCallerInfoCommentInterceptor extends StatementDecoratorIntercept
         return changedArgs;
     }
 
-    /** Statement.executeQuery, executeUpdate 를 위한 Sql 변경 */
+    /**
+     * Statement.executeQuery, executeUpdate 를 위한 Sql 변경
+     */
     protected Object[] changeExecuteSql(Method method, Object[] args) {
         if (args == null) {
             log.debug("sql not changed {}", method);
@@ -182,8 +149,6 @@ public class SqlCallerInfoCommentInterceptor extends StatementDecoratorIntercept
         StringBuilder builder = new StringBuilder();
         builder.append(" /* ")
             .append(projectName)
-            .append(" from ")
-            .append(LOCALHOST_IPADDRESSES)
             .append(" */ ")
             .append(sql);
         return builder.toString();
