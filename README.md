@@ -40,3 +40,5 @@ dataSource.setJdbcInterceptors("in.woowa.tomcat.jdbc.pool.interceptor.SqlCallerI
 
 **영문 대소문자, 숫자, 밑줄(_), 공백만 허용된다.**
 
+실제 interceptor 에 대한 초기화는 최초의 DB Connection 요청이 발생하는 순간이다. 
+`DataSource` 객체만 생성했다고 해서 interceptor가 초기화 되지는 않으므로 정확한 테스트는 실제 커넥션을 맺어봐야 한다. 
