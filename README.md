@@ -1,12 +1,12 @@
 # tomcat-jdbc-pool-sql-caller-info-comment
 
 [Tomcat JDBC Connection Pool](https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html)의 `jdbcInterceptors`를 구현하여, 
-JDBC PreparedStatement SQL 요청을 가로채어, 맨 앞에 호출자 관련 정보와 IP Address들을 주석으로 넣고 DB로 전송한다.
+JDBC PreparedStatement, Statement SQL 요청을 가로채어, 맨 앞에 호출자 관련 정보를 주석으로 넣고 DB로 전송한다.
 
 예를들어 `SELECT 1 FROM DUAL` 이라는 쿼리가 있다면 실제로는 아래 쿼리가 DB로 전달된다. 
 
 ```sql
-/* myproject_name from 192.168.1.1,... */ SELECT 1 FROM DUAL 
+/* myproject_name */ SELECT 1 FROM DUAL
 ```
 
 DB 관리자는 위 쿼리를 보고 호출자를 가늠할 수 있게 된다.
