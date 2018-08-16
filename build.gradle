@@ -1,6 +1,7 @@
 plugins {
     id 'java'
 }
+
 apply plugin: 'maven'
 apply plugin: 'jacoco'
 
@@ -41,17 +42,6 @@ targetCompatibility = javaVersion
 sourceCompatibility = javaVersion
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: 'http://nexus.woowa.in/content/repositories/releases') {
-            }
-            snapshotRepository(url: 'http://nexus.woowa.in/content/repositories/snapshots') {
-            }
-        }
-    }
-}
 
 // 소스와 JavaDoc 배포를 위한 작업
 task sourcesJar(type: Jar, dependsOn: classes) {
