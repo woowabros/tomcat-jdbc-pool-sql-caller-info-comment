@@ -1,5 +1,7 @@
 # tomcat-jdbc-pool-sql-caller-info-comment
 
+> 이 리포는 우아한형제들 기술블로그의 [JDBC로 실행되는 SQL에 자동으로 프로젝트 정보 주석 남기기](https://techblog.woowahan.com/2584/) 아티클의 예제 코드입니다.
+
 [Tomcat JDBC Connection Pool](https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html)의 `jdbcInterceptors`를 구현하여, 
 JDBC PreparedStatement, Statement SQL 요청을 가로채어, 맨 앞에 호출자 관련 정보를 주석으로 넣고 DB로 전송한다.
 
